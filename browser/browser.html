@@ -1,0 +1,495 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml">
+<head>
+    <title></title>
+    <script src="http://code.jquery.com/jquery-1.11.0.min.js"></script>
+    <script type="text/javascript" src="http://cdn.mathjax.org/mathjax/latest/MathJax.js?config=TeX-AMS-MML_HTMLorMML"></script>
+    <style>
+        input
+        {
+            /* margin-top: .7em;*/
+        }
+        #backspace
+        {
+            padding-top: 5px;
+            padding-left: 5px;
+            padding-right: 5px;
+            padding-bottom: 5px;
+        }
+        .output
+        {
+            border: 1px solid #C5C5C5;
+            padding: 1em;
+            width: auto;
+            top: 0;
+            left: 2em;
+            min-width: 20em;
+            min-height: 40px;
+        }
+        .box
+        {
+        }
+        #tableWraper
+        {
+            margin-top: 2px;
+            padding: 2px;
+            border: 1px solid #C5C5C5;
+            width: 528px;
+        }
+        #mathJaxTable tr td
+        {
+            padding-top: 10px;
+            padding-bottom: 10px;
+            padding-left: 15px;
+            padding-right: 15px;
+            border: 1px solid #C5C5C5;
+            cursor: pointer;
+        }
+        #mathJaxTable tr
+        {
+            border-bottom: 1px solid red;
+        }
+    </style>
+    <script>
+		var riz = "What is the name?";
+        (function () {
+            var QUEUE = MathJax.Hub.queue;
+            var math = null, box = null;
+            var HIDEBOX = function () { box.style.visibility = "hidden" }
+            var SHOWBOX = function () { box.style.visibility = "visible" }
+            QUEUE.Push(function () {
+                math = MathJax.Hub.getAllJax("MathOutput")[0];
+                box = document.getElementById("box");
+                SHOWBOX();
+            });
+            window.UpdateMath = function (TeX) {
+                QUEUE.Push(HIDEBOX, ["Text", math, "\\displaystyle{" + TeX + "}"], SHOWBOX);
+            }
+        })();
+        var data = '';
+        function f(v) {
+            data += v;
+            UpdateMath(data);
+        }
+        $(document).ready(function () {
+            $('#calc span').click(function () {
+                f($(this).text());
+            });
+            $('#clr').click(function () {
+                data = '';
+                f('');
+            });
+            $('#formula').click(function () {
+                backSpace();
+            });
+            $(document).click(function () {
+                updateMathoutPut();
+            });
+
+            $("#mathAreaWithPad").click(function (event) {
+                event.stopPropagation();
+            });
+        });
+        $(document).ready(function () {
+            $('#mathJaxTable tr td').click(function () {
+                var elmVal = $(this).text().trim();
+                if ($(this).attr("id") == "pi") {
+                    elmVal = ' { \\pi } ';
+                }
+                else if ($(this).attr("id") == "noteq") {
+                    elmVal = ' { \\neq } ';
+                }
+                else if ($(this).attr("id") == "del") {
+                    data = '';
+                    f('');
+                    return;
+                }
+                if ($(this).attr("id") == "division") {
+                    if ($('.txtCalc').attr('id') == undefined) {
+                        $('#MathOutput .MathJax_Display').append('<div id="div" style="position: absolute"><div><input class="txtCalc" onBlur="setId(this.id)" id="txt_Numerator" type="text" style="border:1px solid green;width:40px" /></div> <div style="background-color:Black;height:1px;width:45px;margin-top:2px;margin-bottom:2px;margin-left:-2px"></div>  <div><input  class="txtCalc" onBlur="setId(this.id)" id="txt_Denomerator" type="text" style="border:1px solid green;width:40px" /></div></div>');
+                        $('#div').css({ 'top': getYPossition('div') + 'px', 'left': getXPossition() + 'px' });
+                        $('#txt_Numerator').focus();
+                    }
+                    else {
+                        //f(' \\over ');
+                        var val = document.getElementById(cur_id).value;
+                        document.getElementById(cur_id).value = '' + val + ' \\over ';
+                    }
+                }
+                else if ($(this).attr("id") == "backspace") {
+                    backSpace();
+                }
+                else if ($(this).attr("id") == "sqrt") {
+                    if ($('.txtCalc').attr('id') == undefined) {
+                        $('#MathOutput .MathJax_Display').append('<input  class="txtCalc" onBlur="setId(this.id)" id="txt_sqrt" type="text" style="border:1px solid green;width:25px" />');
+                        $('#txt_sqrt').focus();
+                    }
+                    else {
+                        var val = document.getElementById(cur_id).value;
+                        document.getElementById(cur_id).value = '' + val + ' \\sqrt ';
+                    }
+                    //f('\\sqrt');
+                }
+                else if ($(this).attr("id") == "exponent") {
+                    if ($('.txtCalc').attr('id') == undefined) {
+                        $('#MathOutput .MathJax_Display').append('<div id="divSqrt" style="position: absolute"><table cellpadding="0px" cellspacing="0px"><tr><td></td><td><div><input  class="txtCalc" onBlur="setId(this.id)" id="txt_pow" type="text" style="border:1px solid green;width:25px;" /></div></td></tr><tr><td><div id="divBase"><input  class="txtCalc" onBlur="setId(this.id)" id="txt_base" type="text" style="border:1px solid green;width:25px" /></div></td><td></td></tr></table></div>');
+                        $('#divSqrt').css({ 'top': getYPossition('divSqrt') + 'px', 'left': getXPossition() + 'px' });
+                        $('#txt_base').focus();
+                    }
+                    else {
+                        //f(' \\over ');
+                        var val = document.getElementById(cur_id).value;
+                        document.getElementById(cur_id).value = '' + val + ' ^ ';
+                    }
+                }
+                else {
+                    if ($('.txtCalc').attr('id') == undefined) {
+                        f(elmVal);
+                    }
+                    else {
+
+                        var val = document.getElementById(cur_id).value;
+                        document.getElementById(cur_id).value = '' + val + elmVal;
+                    }
+                    // f($(this).text());
+                }
+            });
+
+            $('#clr').click(function () {
+                data = '';
+                f('');
+            });
+
+            $('#get').click(function () {
+                $('#MathOutput .MathJax_Display').append('(<input class="txtCalc" onBlur="setId(this.id)" id="txt_Numerator" type="text" style="border:1px solid green;width:25px" />&nbsp;&#247;&nbsp;<input  class="txtCalc" onBlur="setId(this.id)" id="txt_Denomerator" type="text" style="border:1px solid green;width:25px" />)');
+            });
+            $('#sr').click(function () {
+                $('#MathOutput .MathJax_Display').append('<input  class="txtCalc" onBlur="setId(this.id)" id="txt_sqrt" type="text" style="border:1px solid green;width:25px" />');
+            });
+            $('#pow').click(function () {
+                $('#MathOutput .MathJax_Display').append('(<input  class="txtCalc" onBlur="setId(this.id)" id="txt_base" type="text" style="border:1px solid green;width:25px" />&nbsp;^&nbsp;<input  class="txtCalc" onBlur="setId(this.id)" id="txt_pow" type="text" style="border:1px solid green;width:25px" />)');
+            });
+            $('#ok').click(function () {
+                var n1 = $('#txt_Numerator').val();
+                var n2 = $('#txt_Denomerator').val();
+                f(' { {' + n1 + '} \\over {' + n2 + '} } ');
+            });
+            $('#srt').click(function () {
+                var n1 = $('#txt_sqrt').val();
+                f(' {  \\sqrt {' + n1 + '} } ');
+            });
+            $('#pow_cal').click(function () {
+                var n1 = $('#txt_base').val();
+                var n2 = $('#txt_pow').val();
+                f('{ ({ ' + n1 + '}) \^ {' + n2 + '} } ');
+            });
+
+
+            //
+
+            $('#focus').click(function () {
+                if ($('.txtCalc').attr('id') != undefined) {
+                    alert($('.txtCalc').attr('id') + '  v');
+                }
+            });
+            $('#done').click(function () {
+                if ($('.txtCalc').attr('id') != undefined) {
+                    var op = $('.txtCalc').attr('id');
+                    if (op == 'txt_Numerator' || op == 'txt_Denomerator') {
+                        var n1 = $('#txt_Numerator').val();
+                        var n2 = $('#txt_Denomerator').val();
+                        f(' { {' + n1 + '} \\over {' + n2 + '} } ');
+                    }
+                    else if (op == 'txt_sqrt') {
+                        var n1 = $('#txt_sqrt').val();
+                        f(' {  \\sqrt {' + n1 + '} } ');
+                    }
+                    else if (op == 'txt_base' || op == 'txt_pow') {
+                        var n1 = $('#txt_base').val();
+                        var n2 = $('#txt_pow').val();
+                        f('{ ({ ' + n1 + '}) \^ {' + n2 + '} } ');
+                    }
+                }
+            });
+        });
+        //--- Focus functions ---
+        var cur_id = '';
+        function setId(id) {
+            cur_id = id;
+
+        }
+        function updateMathoutPut() {
+     
+            //----changing eqn on blur---
+            if ($('#txt_Numerator').attr('id') != undefined && $('#txt_Denomerator').attr('id') != undefined) {
+                if ($('#txt_Numerator').val().trim() != '' && $('#txt_Denomerator').val().trim() != '') {
+                    focusOut();
+                }
+            }
+            if ($('#txt_sqrt').attr('id') != undefined) {
+                if ($('#txt_sqrt').val().trim() != '') {
+                    focusOut();
+                }
+            }
+            if ($('#txt_base').attr('id') != undefined && $('#txt_base') != undefined) {
+                if ($('#txt_base').val().trim() != '' && $('#txt_base').val().trim() != '') {
+                    focusOut();
+                }
+            }
+        }
+        function focusOut() {
+            if ($('.txtCalc').attr('id') != undefined) {
+                var op = $('.txtCalc').attr('id');
+                if (op == 'txt_Numerator' || op == 'txt_Denomerator') {
+                    var n1 = $('#txt_Numerator').val();
+                    var n2 = $('#txt_Denomerator').val();
+                    f(' { {' + n1 + '} \\over {' + n2 + '} } ');
+                }
+                else if (op == 'txt_sqrt') {
+                    var n1 = $('#txt_sqrt').val();
+                    f(' {  \\sqrt {' + n1 + '} } ');
+                }
+                else if (op == 'txt_base' || op == 'txt_pow') {
+                    var n1 = $('#txt_base').val();
+                    var n2 = $('#txt_pow').val();
+                    f('{ ({ ' + n1 + '}) \^ {' + n2 + '} } ');
+                }
+            }
+        }
+        function getXPossition() {
+            var p = $("#MathJax-Element-1-Frame");
+            var position = p.position();
+            return position.left + $('#MathJax-Element-1-Frame').width() + 10;
+        }
+        function getYPossition(elemId) {
+            var p = $("#MathJax-Element-1-Frame");
+            var position = p.position();
+            var ht = position.top;
+            var hgt = elemId != "divSqrt" ? $('#' + elemId).height() : ($('#' + elemId).height()) + 25;
+            var diff = $('#MathJax-Element-1-Frame').height() - hgt;
+            return (diff > 0) ? ht + math.abs(diff / 2) : ht - Math.abs(diff / 2);
+        }
+        function getY_Sqrt() {
+            var p = $("#span");
+            var position = p.position();
+            alert(position.top + ($('#span').height()) / 2);
+        }
+        //---------- function for implementaion of backspace ------
+
+        function backSpace() {
+            //------ Check if textboxes are open --
+            if ($('#txt_Numerator').attr('id') != undefined && $('#txt_Denomerator').attr('id') != undefined) {
+                $('#div').remove();
+                return;
+            }
+            if ($('#txt_sqrt').attr('id') != undefined) {
+                $('#txt_sqrt').remove();
+                return;
+            }
+            if ($('#txt_base').attr('id') != undefined && $('#txt_base') != undefined) {
+                $('#divSqrt').remove();
+                return;
+            }
+            //-------------------------------------
+            var userExp = $('#MathJax-Element-1').text();
+            userExp = userExp.replace('\\displaystyle{', '').replace(/ /g, '');
+            userExp = userExp.substring(0, userExp.length - 1);
+            var expAry = userExp.split('');
+            var iCurlyCount = 0;
+            var modExp = '';
+            for (var i = expAry.length - 1; i >= 0; i--) {
+                if (expAry[i] == '}')
+                    iCurlyCount++;
+                if (expAry[i] == '{')
+                    iCurlyCount--;
+                if (iCurlyCount == 0) {
+                    for (var x = 0; x < i; x++) {
+                        modExp = modExp + '' + expAry[x];
+                    }
+                    if (modExp.indexOf('sqrt') != -1)
+                        modExp = modExp.replace(/sqrt/g, 'sqrt ');
+                    if (modExp.indexOf('pi') != -1)
+                        modExp = modExp.replace(/pi/g, 'pi ');
+                    if (modExp.indexOf('neq') != -1)
+                        modExp = modExp.replace(/neq/g, 'neq ');
+                    data = '';
+                    f('');
+                    f(modExp);
+                    break;
+                }
+            }
+
+        }
+
+        //---------------------------------------------------------
+    </script>
+</head>	
+<body onclick="javascript:updateMathoutPut();">
+
+    <p>
+        Type your equation:&nbsp;
+    </p>
+    <div id="mathAreaWithPad" style="width: 528px;">
+	<div id="test" style="width: 528px;">Rizwan</div>
+    <div class="box" id="box" style="visibility: hidden">
+        <div id="MathOutput" class="output" style="width: 500px; overflow-y: scroll">
+            $${}$$
+        </div>
+    </div>
+    <div id="tableWraper" style="width: 528px;">
+        <table id="mathJaxTable">
+            <tr style="border: 10px solid green;">
+                <td>
+                    1
+                </td>
+                <td>
+                    2
+                </td>
+                <td style="">
+                    3
+                </td>
+                <td>
+                    <
+                </td>
+                <td>
+                    >
+                </td>
+                <td>
+                    =
+                </td>
+                <td id="noteq" style="height: 5px; width: 8px; margin-left: -4px; padding-top: -5px">
+                    <span style="margin-left: -10px; margin-top: -20px; position: absolute">$${ \neq }$$
+                    </span>
+                </td>
+                <td style="font-size: 26px; font-weight: bold; padding-top: 5px; padding-bottom: 5px;
+                    padding-left: 8px; padding-right: 8px;" id="backspace">
+                    &larr;
+                </td>
+            </tr>
+            <tr>
+                <td>
+                    4
+                </td>
+                <td>
+                    5
+                </td>
+                <td>
+                    6
+                </td>
+                <td>
+                    +
+                </td>
+                <td>
+                    -
+                </td>
+                <td id="division">
+                    <div style="height: 5px; width: 5px; border: 1px solid green">
+                    </div>
+                    <div style="margin-left: -4px; border-bottom: 1px solid black; width: 15px; height: 2px;">
+                    </div>
+                    <div style="height: 5px; width: 5px; border: 1px solid green; margin-top: 2px">
+                    </div>
+                </td>
+                <td>
+                    *
+                </td>
+                <td>
+                    h
+                </td>
+                <td>
+                    x
+                </td>
+                <td>
+                    y
+                </td>
+                <td>
+                    z
+                </td>
+            </tr>
+            <tr>
+                <td>
+                    7
+                </td>
+                <td>
+                    8
+                </td>
+                <td>
+                    9
+                </td>
+                <td id="sqrt" >
+                    <span >&radic;</span>
+                </td>
+                <td id="exponent">
+                    <div style="border: 1px solid green; width: 5px; height: 5px">
+                    </div>
+                    <div style="border: 1px solid green; width: 3px; height: 3px; margin-left: 8px; margin-top: -12px">
+                    </div>
+                </td>
+                <td id="pi" style="height: 5px; width: 8px; margin-left: -4px; padding-top: -5px">
+                    <span style="margin-left: -10px; margin-top: -20px; position: absolute">$$ \pi $$
+                    </span>
+                </td>
+                <td id="del" style="font-size: x-small">
+                    del
+                </td>
+                <td>
+                    a
+                </td>
+                <td>
+                    b
+                </td>
+                <td>
+                    c
+                </td>
+            </tr>
+            <tr>
+                <td>
+                    0
+                </td>
+                <td>
+                    .
+                </td>
+                <td style="border: 0px solid gray;">
+                </td>
+                <td style="border:0px solid #C5C5C5;">
+                    
+                </td>
+                <td style="border:0px solid #C5C5C5;">
+                        
+                </td>
+                <td>
+                    (
+                </td>
+                <td>
+                    )
+                </td>
+                <td>
+                    p
+                </td>
+                <td>
+                    q
+                </td>
+                <td>
+                    r
+                </td>
+            </tr>
+            <tr>
+            </tr>
+        </table>
+    </div>
+    </div>
+    <div>
+       <!-- <input type="button" value="Click here after entering value in textboxes" id="done" />
+        <input type="button" value="get formula" id="formula" />
+         <input type="button" value="Clear" id="clr" /> -->
+    </div>
+    <!-- <input type="button" value="get" id="get" />
+    <input type="button" value="sr" id="sr" />
+    <input type="button" value="pow" id="pow" />
+    <input type="button" value="div" id="ok" />
+    <input type="button" value="sqrt" id="srt" />
+    <input type="button" value="pow_cal" id="pow_cal" />
+    <input type="button" value="getlast focus" id="focus" />
+    -->
+</body>
+</html>

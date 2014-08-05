@@ -1,0 +1,40 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml">
+<head>
+    <title></title>
+    <script src="http://code.jquery.com/jquery-1.11.0.min.js"></script>
+    <script type="text/javascript" src="http://cdn.mathjax.org/mathjax/latest/MathJax.js?config=TeX-AMS-MML_HTMLorMML"></script>
+    <script src="Javascript/external/ckeditor/ckeditor.js?v=1.0"></script>
+	
+</head>	
+<body>
+<table>
+    <tr id="trpassagetext">
+		<td class="text-vat text-grey text-right">Passage Text:</td>
+		<td>
+			<!-- CKEditor -->
+			<textarea id="passageeditor" style="resize:none;" onchange="javascript:CommonFunctions.IsFieldChanged();" name="passageeditor" placeholder="Type here..."></textarea>
+			<!--- END CKEditor -->
+		</td>
+	</tr>
+</table>
+<script>
+	CKEDITOR.replace( 'passageeditor', {
+		// Load the simplebox plugin.
+		extraPlugins: 'simplebox,mathjax,iframedialog,scmath',
+		// Set height to make more content visible.
+		height: 200,
+		// Rearrange toolbar groups and remove unnecessary plugins.
+		toolbarGroups: [
+			{ name: 'clipboard',   groups: [ 'clipboard', 'undo' ] },
+			{ name: 'insert'},
+			{ name: 'basicstyles', groups: [ 'basicstyles', 'cleanup' ] },
+			{ name: 'paragraph',   groups: [ 'list', 'indent' ] },
+			{ name: 'styles' },
+			{ name: 'others', groups:['MathJax Dialog', 'scmath'] },
+		],
+		removePlugins: 'font,iframe,pagebreak,flash,stylescombo,print,preview,save,smiley,pastetext,pastefromword'
+	} );
+    </script>
+</body>
+</html>
